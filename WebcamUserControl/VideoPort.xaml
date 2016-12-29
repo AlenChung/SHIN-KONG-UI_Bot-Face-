@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="WebcamUserControl.VideoPortControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"              
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"            
+             xmlns:aforge="clr-namespace:AForge.Controls;assembly=AForge.Controls"     
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <DataTemplate x:Key="DevicesListTemplate">
+            <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid Background="White" Width="970" Height="788" Margin="2">
+        <WindowsFormsHost Width="960" Height="600"  Visibility="Collapsed" VerticalAlignment="Top">
+            <aforge:VideoSourcePlayer x:Name="videoSourcePlayer" />
+        </WindowsFormsHost>
+        <Image x:Name="LeftImage" Grid.Column="0" Margin="1,1,1,5" AutomationProperties.IsOffscreenBehavior="Onscreen" Stretch="UniformToFill" Cursor="SizeAll" />
+        <StackPanel Orientation="Vertical" RenderTransformOrigin="0.5,0.5" Margin="885,0,0,6" VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="36" Opacity="0">
+            <StackPanel.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="0.098"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </StackPanel.RenderTransform>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="22">
+                <TextBlock Width="48"
+                           Text="相機來源" TextAlignment="Left" FlowDirection="LeftToRight" Margin="0,12,0,-6" VerticalAlignment="Top" RenderTransformOrigin="1.175,-2.408" />
+                <ComboBox  HorizontalAlignment="Left" VerticalAlignment="Top"
+                	x:Name="VideoDevicesComboBox" ItemTemplate="{StaticResource DevicesListTemplate}" Margin="0,10,0,-10"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="23" Margin="0,10,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
