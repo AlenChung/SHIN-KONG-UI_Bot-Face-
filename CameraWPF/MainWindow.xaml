@@ -14,12 +14,12 @@
         </Grid.ColumnDefinitions>
         <WebCam:VideoPortControl Name="WebcamCtrl" Margin="0,10,0,-10" Grid.ColumnSpan="2"/>
         <Grid Width="500" Grid.ColumnSpan="2" Margin="146,0">
-            <Button Content="開始辨識" Height="24" Width="100" x:Name="StartVideoFeed" Click="StartVideoFeed_Click" Margin="943,604,-543,41" Padding="1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center" />
-            <Button Content="停止" Height="24" Width="100" x:Name="StopVideoFeed" Click="StopVideoFeed_Click" Margin="0,628,-543,17" HorizontalAlignment="Right" />
-            <Button Content="儲存" Height="24" Width="100" x:Name="SaveSnapshot" Click="SaveSnapshotButton_Click" Margin="0,652,-543,-7" HorizontalAlignment="Right" />
+            <Button Content="開始辨識" Height="24" Width="100" x:Name="StartVideoFeed" Click="StartVideoFeed_Click" Margin="718,549,-318,96" Padding="1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center" />
+            <Button Content="播音" Height="24" Width="100" x:Name="StopVideoFeed" Click="StopVideoFeed_Click" Margin="0,573,-318,72" HorizontalAlignment="Right"  />
+            <Button Content="儲存" Height="24" Width="100" x:Name="SaveSnapshot" Click="SaveSnapshotButton_Click" Margin="0,597,-318,48" HorizontalAlignment="Right"  />
         </Grid>
-        <Image Source="photo\Sks_logo.jpg" Width="211" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="330"/>
+        <Image Source="photo\Sks_logo.jpg" Width="190" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="292" Margin="-5,0,0,0"/>
 
 
     </Grid>
-</Window>
+</Window>   

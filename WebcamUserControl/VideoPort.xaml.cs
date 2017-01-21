@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,18 +25,20 @@ using System.Windows.Media.Imaging;
 using System.Drawing.Drawing2D;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using System.Windows.Input;
+
 
 namespace WebcamUserControl
 {
     public partial class VideoPortControl : UserControl
     {
-        
+
         Microsoft.ProjectOxford.Face.FaceServiceClient faceClient = new FaceServiceClient("8f7a031e5133417aa8b1f1ab525efec1");
         // Create grabber. 
-       // FrameGrabber<Face[]> grabber = new FrameGrabber<Face[]>();
+        // FrameGrabber<Face[]> grabber = new FrameGrabber<Face[]>();
         private readonly FrameGrabber<LiveCameraResult> _grabber = null;
         private LiveCameraResult _latestResultsToDisplay = null;
-        public  string GroupName = "mtcbotdemo";
+        public string GroupName = "mtcbotdemo";
         public string ShinKuanTestPersonID = "f7d3f0af-7866-4f2f-80eb-d8d815e8e735";
         public string ShinKuanTestPersistedFaceId = "8477e7fa-529e-4c43-9e6e-54e6264a36d1";
         public string Face_Directory = "Face";
@@ -46,41 +49,47 @@ namespace WebcamUserControl
         private static string BLOB_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=shinkong;AccountKey=pyl//qs7YQ2VPm1Dl7/8hw5ObceaMTamfobzTvOajmCQyWzWxuS1NYThvfp4HLYkeNRjJYeQ5rc7zZ38YR/Szw==;";
         private ObservableCollection<Person> Persons = new ObservableCollection<Person>();
         private bool _fuseClientRemoteResults;
+        private bool Sound_Flag = false;
+
+        WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
         private static readonly ImageEncodingParam[] s_jpegParams = {
             new ImageEncodingParam(OpenCvSharp.ImageEncodingID.JpegQuality,60) //ImwriteFlags.JpegQuality, 60)
         };
         public VideoPortControl()
         {
+
             InitializeComponent();
+            this.KeyDown += new KeyEventHandler(View_KeyDown);
+
             // Create grabber. 
             _grabber = new FrameGrabber<LiveCameraResult>();
             // Set up a listener for when the client receives a new frame.
             _grabber.NewFrameProvided += (s, e) =>
             {
-               // Console.WriteLine("ddvvvvvvvvvvvvvvvvvvvvvvvvv");
+
                 // The callback may occur on a different thread, so we must use the
                 // MainWindow.Dispatcher when manipulating the UI. 
                 this.Dispatcher.BeginInvoke((Action)(() =>
                 {
                     var device = (FilterInfo)VideoDevicesComboBox.SelectedItem;
                     // Display the image in the left pane.
-                     LeftImage.Source = e.Frame.Image.ToBitmapSource();
-                 //   Console.WriteLine("ddddddddddddddddd");
+                    LeftImage.Source = e.Frame.Image.ToBitmapSource();
+
                     //videoSourcePlayer.VideoSource= e.Frame.Image.ToBitmapSource();
 
                     // If we're fusing client-side face detection with remote analysis, show the
                     // new frame now with the most recent analysis available. 
                     /* if (_fuseClientRemoteResults)
-                     {
-                         RightImage.Source = VisualizeResult(e.Frame);
-                     }*/
+                     {
+                         RightImage.Source = VisualizeResult(e.Frame);
+                     }*/
                 }));
 
                 // See if auto-stop should be triggered. 
-             /*   if (Properties.Settings.Default.AutoStopEnabled && (DateTime.Now - _startTime) > Properties.Settings.Default.AutoStopTime)
-                {
-                    _grabber.StopProcessingAsync();
-                }*/
+                /*   if (Properties.Settings.Default.AutoStopEnabled && (DateTime.Now - _startTime) > Properties.Settings.Default.AutoStopTime)
+                   {
+                       _grabber.StopProcessingAsync();
+                   }*/
             };
 
             // Set up a listener for when the client receives a new result from an API call. 
@@ -115,20 +124,22 @@ namespace WebcamUserControl
                             apiName = "Computer Vision";
                             message = visionEx.Error.Message;
                         }
-                       // MessageArea.Text = string.Format("{0} API call failed on frame {1}. Exception: {2}", apiName, e.Frame.Metadata.Index, message);
+                        // MessageArea.Text = string.Format("{0} API call failed on frame {1}. Exception: {2}", apiName, e.Frame.Metadata.Index, message);
                     }
                     else
                     {
                         _latestResultsToDisplay = e.Analysis;
 
                         // Display the image and visualization in the right pane. 
-                       /* if (!_fuseClientRemoteResults)
-                        {
-                            RightImage.Source = VisualizeResult(e.Frame);
-                        }*/
+                        /* if (!_fuseClientRemoteResults)
+                         {
+                             RightImage.Source = VisualizeResult(e.Frame);
+                         }*/
                     }
                 }));
             };
+
+        
             var videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
 
             foreach (var d in videoDevices)
@@ -141,7 +152,31 @@ namespace WebcamUserControl
         public string OverlayImagePath { get; set; }
 
 
+        private void View_KeyDown(object sender, KeyEventArgs e)  //進不來!!!!!!!!!!!!!!!!!!!!
+        {
+            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAQWWWWWWWWWWWWWWWWWWW");
+            try
+            {
+                switch (e.Key)
+                {
+                    case Key.F1:
+                        WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
+                        wplayer.URL = "3022.mp3";
+                        wplayer.controls.play();
+                        Console.WriteLine("AAAAAAAAAAAAAAAAAAAAa");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
 
+            }
+        }
+        private static void MyFunction()
+        {
+            // Loop in here
+           
+        }
 
 
 
@@ -150,28 +185,20 @@ namespace WebcamUserControl
         /// </summary>
         public async void StartVideoFeed()
         {
-            var openFileDialog = new OpenFileDialog()
-            {
-                DefaultExt = "png",
-                Filter = "PNG Image | *.png",
-                Title = "Please select an image to overlay onto the video feed..."
-            };
 
-            if (openFileDialog.ShowDialog() == true)
-                OverlayImagePath = openFileDialog.FileName;
 
             var device = (FilterInfo)VideoDevicesComboBox.SelectedItem;
             if (device != null)
             {
                 var source = new VideoCaptureDevice(device.MonikerString);
                 // register NewFrame event handler
-                Console.WriteLine("ppppp");
-            //    source.NewFrame += new NewFrameEventHandler(video_NewFrame);
+                Console.WriteLine("pp here");
+                //    source.NewFrame += new NewFrameEventHandler(video_NewFrame);
 
-             //   videoSourcePlayer.VideoSource = source;
-              //  videoSourcePlayer.Start();
+                //   videoSourcePlayer.VideoSource = source;
+                //  videoSourcePlayer.Start();
             }
-
+           
 
             // How often to analyze. 
             _grabber.TriggerAnalysisOnInterval(Properties.Settings.Default.AnalysisInterval);
@@ -184,8 +211,22 @@ namespace WebcamUserControl
         /// </summary>
         public void StopVideoFeed()
         {
-            videoSourcePlayer.SignalToStop();
+            
+            //WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
+
+            new System.Threading.Thread(() =>
+            {
+                var p1 = new System.Windows.Media.MediaPlayer();
+                p1.Open(new System.Uri(@"C:\Users\v-bizhon\Downloads\SHIN-KONG-UI_Bot-Face-\SHIN-KONG-UI_Bot-Face-\Sound\3022.mp3"));
+                p1.Play();
+                System.Threading.Thread.Sleep(1000);
+            }).Start();
+            
+            return;
         }
+      
+
+
 
         /// <summary>
         /// Saves a snapshot of current webcam video frame.
@@ -213,56 +254,84 @@ namespace WebcamUserControl
 
         private async Task<LiveCameraResult> FacesAnalysisFunction(VideoFrame frame)
         {
-            
-
+          
             // Encode image. 
             var framestream = frame.Image.ToMemoryStream(".jpg", s_jpegParams);
-
             Bitmap temp_frame = new Bitmap(frame.Image.ToMemoryStream(".jpg", s_jpegParams));
-           
-            // im.Save("image.bmp");
 
             // Submit image to API. 
-            var attrs = new List<FaceAttributeType> { FaceAttributeType.Age,
-                FaceAttributeType.Gender, FaceAttributeType.HeadPose };
-            var faces = await faceClient.DetectAsync(framestream, true,true,returnFaceAttributes: attrs);
+            var attrs = new List<FaceAttributeType> { FaceAttributeType.Age, FaceAttributeType.Gender, FaceAttributeType.HeadPose };
+            var faces = await faceClient.DetectAsync(framestream, true, true, returnFaceAttributes: attrs);
             // Count the API call. 
             int i;
-            for( i =0 ; i < faces.Length ; i++){
-                Console.WriteLine("age : "+faces[i].FaceAttributes.Age);
-                Console.WriteLine("gender : "+faces[i].FaceAttributes.Gender);
+            for (i = 0; i < faces.Length; i++)
+            {
+               // Console.WriteLine("age : " + faces[i].FaceAttributes.Age);
+               // Console.WriteLine("gender : " + faces[i].FaceAttributes.Gender);
             }
-
 
             var identifyResult = await faceClient.IdentifyAsync(GroupName, faces.Select(ff => ff.FaceId).ToArray());
             for (int idx = 0; idx < faces.Length; idx++)
             {
                 // Update identification result for rendering
-             
                 var res = identifyResult[idx];
                 if (res.Candidates.Length > 0) //&& Persons.Any(p => p.PersonId == res.Candidates[0].PersonId.ToString()))
                 {
-                    //  face.PersonName = Persons.Where(p => p.PersonId == res.Candidates[0].PersonId.ToString()).First().PersonName;
-                    Console.WriteLine("hi hank");
-                    WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
-       
-                    wplayer.URL = "3022.mp3";
-                    wplayer.controls.play();
+                    if (faces[idx].FaceAttributes.HeadPose.Yaw >= 10 || faces[idx].FaceAttributes.HeadPose.Yaw <= -10)
+                    {
+                        //face's yaw angle is too large
+                        break;
+                    }
 
+                    if (faces[idx].FaceRectangle.Width <= 65)
+                    {
+                        //face's rectangle width too short
+                        break;
+                    }
+
+                    // Console.WriteLine("hi hank");
+
+
+
+                    if (!Sound_Flag) // Detect face code and play mp3 only one 
+                    {
+                        new System.Threading.Thread(() =>
+                        {
+                            var p1 = new System.Windows.Media.MediaPlayer();
+                            p1.Open(new System.Uri(@"C:\Users\v-bizhon\Downloads\SHIN-KONG-UI_Bot-Face-\SHIN-KONG-UI_Bot-Face-\Sound\3022.mp3"));
+                            p1.Play();
+                            System.Threading.Thread.Sleep(1000);
+                        }).Start();
+
+                        Console.WriteLine(wplayer.playState.ToString());
+                        Sound_Flag = true;
+                        
+                     
+                    }
+                   else
+                    {
+                       //StopVideoFeed();
+                        
+                    }
+
+                    
+                  
+       
+
+
+
+
+                     Console.WriteLine(wplayer.playState.ToString());
                     Bitmap CroppedImage = null;
                     if (faces[idx].FaceAttributes.HeadPose.Roll >= 10 || faces[idx].FaceAttributes.HeadPose.Roll <= -10)
                     {
                         System.Drawing.Rectangle rect = new System.Drawing.Rectangle(Convert.ToInt32(faces[idx].FaceRectangle.Left), Convert.ToInt32(faces[idx].FaceRectangle.Top), faces[idx].FaceRectangle.Width, faces[idx].FaceRectangle.Height);
-
                         CroppedImage = new Bitmap(CropRotatedRect(temp_frame, rect, Convert.ToSingle(faces[idx].FaceAttributes.HeadPose.Roll * -1), true));
                     }
                     else
                     {
                         CroppedImage = new Bitmap(temp_frame.Clone(new System.Drawing.Rectangle(faces[idx].FaceRectangle.Left, faces[idx].FaceRectangle.Top, faces[idx].FaceRectangle.Width, faces[idx].FaceRectangle.Height), temp_frame.PixelFormat));
-
                     }
-
-
                     //Save to local
                     String FacePath = Directory.GetCurrentDirectory() + "\\" + Face_Directory;
                     if (!Directory.Exists(FacePath))
@@ -270,7 +339,7 @@ namespace WebcamUserControl
                         Directory.CreateDirectory(FacePath);
                     }
                     StringBuilder st = new StringBuilder();
-                    st.Append(FacePath+"\\"+Face_File);   
+                    st.Append(FacePath + "\\" + Face_File);
                     string outputFileName = st.ToString();
                     using (MemoryStream memory = new MemoryStream())
                     {
@@ -289,7 +358,7 @@ namespace WebcamUserControl
 
                     //Upload To Blob
                     string filename = Face_Directory + "\\" + Face_File;
-     
+
                     string path;
                     if (Path.GetPathRoot(filename) != null && Path.GetPathRoot(filename) != "")
                         path = filename.Replace(Path.GetPathRoot(filename), "").Replace("\\", "/");
@@ -304,8 +373,6 @@ namespace WebcamUserControl
                     {
                         blockBlob.UploadFromStream(fileStream);
                     }
-
-
 
                     String CardPath = Directory.GetCurrentDirectory() + "\\" + Card_Directory;
                     if (!Directory.Exists(CardPath))
@@ -360,23 +427,21 @@ namespace WebcamUserControl
                                                 GraphicsUnit.Pixel);
                                 canvas.Save();
                             }
-                            if (faces[idx].FaceAttributes.HeadPose.Yaw > 0)//looking right
+                            /* if (faces[idx].FaceAttributes.HeadPose.Yaw > 0)//looking right
                             {
                                 bitmap.RotateFlip(RotateFlipType.Rotate180FlipY);
-                            }
-
+                            }*/
+                            bitmap.RotateFlip(RotateFlipType.Rotate180FlipY);
                             try
                             {
-
-
                                 string fi_path = Face_Directory + "\\" + "final.png";
-                              
+
                                 using (Bitmap tempBitmap = new Bitmap(bitmap))
                                 {
                                     using (Bitmap resizedBitmap = new Bitmap(tempBitmap, new System.Drawing.Size((int)(1858 * 0.3f), (int)(2480 * 0.3f))))
                                     {
                                         resizedBitmap.Save(fi_path, System.Drawing.Imaging.ImageFormat.Png);
-                                       
+
                                     }
                                 }
 
@@ -385,13 +450,11 @@ namespace WebcamUserControl
                             {
                                 System.Console.WriteLine(ex);
                             }
-
-
                         }
                     }
-              
+                    //draw image
                     StringBuilder slide_st = new StringBuilder();
-                    slide_st.Append(CardPath + "\\" + "Slide.png");
+                    slide_st.Append(CardPath + "\\" + "Background.png");
                     string slide_img_path = slide_st.ToString();
                     using (System.Drawing.Image slide_frame = System.Drawing.Image.FromFile(slide_img_path.ToString()))
                     {
@@ -413,52 +476,41 @@ namespace WebcamUserControl
                                 String fi_path = Face_Directory + "\\" + "final.png";
                                 System.Drawing.Image temp_body = System.Drawing.Image.FromFile(fi_path);
 
-                                int dx = 520;
-                                int dy = 100;
+                                int dx = 80;
+                                int dy = 50;
                                 //canvas.DrawImage(temp_body, dx, dy, Constants.FIGURE_WIDTH * Constants.resizeRatio, Constants.FIGURE_HEIGHT * Constants.resizeRatio);
                                 canvas.DrawImage(temp_body, dx, dy, 1858 * 0.3f, 2480 * 0.3f);
-
-
                                 canvas.Save();
-
-
-                                System.Console.WriteLine("finish fig bitmap");
-
+                              //  System.Console.WriteLine("finish fig bitmap");
                             }
                             try
                             {
-
-
                                 string fi_path = Face_Directory + "\\" + "Final_Card.png";
-
                                 using (Bitmap tempBitmap = new Bitmap(bitmap))
                                 {
                                     using (Bitmap resizedBitmap = new Bitmap(tempBitmap, new System.Drawing.Size((int)(bitmap.Width), (int)(bitmap.Height))))
                                     {
                                         resizedBitmap.Save(fi_path, System.Drawing.Imaging.ImageFormat.Png);
-
                                     }
                                 }
-
                             }
                             catch (Exception ex)
                             {
                                 System.Console.WriteLine(ex);
                             }
-
                         }
                     }
-                    
                 }
                 else
                 {
-                  //  face.PersonName = "Unknown";
+                    //  face.PersonName = "Unknown";
                 }
             }
-
             // Output. 
             return new LiveCameraResult { Faces = faces };
         }
+
+       
 
         public static Bitmap CropRotatedRect(Bitmap source, System.Drawing.Rectangle rect, float angle, bool HighQuality)
         {
@@ -479,12 +531,12 @@ namespace WebcamUserControl
         }
 
 
-        private async void video_NewFrame(object sender, NewFrameEventArgs eventArgs)
+        private void video_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             if (!string.IsNullOrWhiteSpace(OverlayImagePath))
             {
                 var frame = eventArgs.Frame; // reference to the current frame   
-               
+
                 var g = Graphics.FromImage(frame);
                 //  await faceClient.DetectAsync(frame.Image.ToMemoryStream(".jpg"));
                 using (System.Drawing.Image backImage = (Bitmap)frame.Clone())
@@ -495,11 +547,11 @@ namespace WebcamUserControl
                     try
                     {
 
-                       // Console.WriteLine(faceimagestream);
-                     //   Microsoft.ProjectOxford.Face.Contract.Face[] faces = await faceserviceclient.DetectAsync(faceimagestream);//, true, true,
+                        // Console.WriteLine(faceimagestream);
+                        //   Microsoft.ProjectOxford.Face.Contract.Face[] faces = await faceserviceclient.DetectAsync(faceimagestream);//, true, true,
 
                         //new FaceAttributeType[] { FaceAttributeType.Gender, FaceAttributeType.Age, FaceAttributeType.Smile, FaceAttributeType.HeadPose, FaceAttributeType.Glasses });
-                      //  Console.WriteLine("asdasdasdasdasdasdasd");
+                        //  Console.WriteLine("asdasdasdasdasdasdasd");
                         //if (faces.Length >= 0)
 
                         //{

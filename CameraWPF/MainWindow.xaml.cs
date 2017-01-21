@@ -1,28 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.IO;
-using WebcamUserControl;
-
-
 namespace CameraWPF
-{  
+{
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+            this.KeyDown += new KeyEventHandler(View_KeyDown);
         }
 
         private void SaveSnapshotButton_Click(object sender, RoutedEventArgs e)
@@ -39,7 +25,36 @@ namespace CameraWPF
         {
             WebcamCtrl.StopVideoFeed();
 
+
         }
+        private  void View_KeyDown(object sender, KeyEventArgs e)//press F1 code 
+        {
+            try
+            {
+                switch (e.Key)
+                {
+                    case Key.F1:
+                        WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
+                        wplayer.URL = "3022.mp3";
+                        wplayer.controls.play();
+                        Console.WriteLine("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+              
+                        WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
+                        wplayer.URL = "3022.mp3";
+                        wplayer.controls.play();
+                        Console.WriteLine("FFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+                
+                
+            }
+            
+        }
+
 
         private void WebcamCtrl_Loaded(object sender, RoutedEventArgs e)
         {
