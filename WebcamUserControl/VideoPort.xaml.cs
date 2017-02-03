@@ -217,7 +217,7 @@ namespace WebcamUserControl
             new System.Threading.Thread(() =>
             {
                 var p1 = new System.Windows.Media.MediaPlayer();
-                p1.Open(new System.Uri(@"C:\Users\v-bizhon\Downloads\SHIN-KONG-UI_Bot-Face-\SHIN-KONG-UI_Bot-Face-\Sound\3022.mp3"));
+                p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face--master\Sound\3022.mp3"));
                 p1.Play();
                 System.Threading.Thread.Sleep(1000);
             }).Start();

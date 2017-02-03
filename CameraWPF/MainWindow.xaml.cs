@@ -34,10 +34,13 @@ namespace CameraWPF
                 switch (e.Key)
                 {
                     case Key.F1:
-                        WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
-                        wplayer.URL = "3022.mp3";
-                        wplayer.controls.play();
-                        Console.WriteLine("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+                        new System.Threading.Thread(() =>
+                        {
+                            var p1 = new System.Windows.Media.MediaPlayer();
+                            p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face--master\Sound\3022.mp3"));
+                            p1.Play();
+                            System.Threading.Thread.Sleep(1000);
+                        }).Start();
 
                         break;
                 }
