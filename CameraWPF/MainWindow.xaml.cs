@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Drawing;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
+
 namespace CameraWPF
 {
     public partial class MainWindow : Window
@@ -33,13 +37,14 @@ namespace CameraWPF
             {
                 switch (e.Key)
                 {
-                    case Key.F1:
+                    case Key.Q:
                         new System.Threading.Thread(() =>
                         {
                             var p1 = new System.Windows.Media.MediaPlayer();
-                            p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face--master\Sound\3022.mp3"));
+                            p1.Volume = 1.0f;
+                            p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face-\Sound\1.wav"));
                             p1.Play();
-                            System.Threading.Thread.Sleep(1000);
+                            System.Threading.Thread.Sleep(5000);
                         }).Start();
 
                         break;
@@ -49,13 +54,85 @@ namespace CameraWPF
             {
               
                         WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
-                        wplayer.URL = "3022.mp3";
+                        wplayer.URL = "1.wav";
                         wplayer.controls.play();
-                        Console.WriteLine("FFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+                        Console.WriteLine("QQQQQQQQQQQQQ");
                 
                 
             }
-            
+
+            try
+            {
+                switch (e.Key)
+                {
+                    case Key.A:
+                        new System.Threading.Thread(() =>
+                        {
+                            var p1 = new System.Windows.Media.MediaPlayer();
+                            p1.Volume = 1.0f;
+                            p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face-\Sound\2.wav"));
+                            p1.Play();
+                            System.Threading.Thread.Sleep(5000);
+                        }).Start();
+
+                        break;
+                    case Key.R:
+                        WebcamUserControl.VideoPortControl.Sound_Flag = false;
+                        break;
+
+                   case Key.F:
+                        String FacePath = Directory.GetCurrentDirectory() + "\\" + "Face"+"\\"+"Final_Card.png";
+                        BitmapImage bi = new BitmapImage();
+                        // BitmapImage.UriSource must be in a BeginInit/EndInit block.
+                        bi.BeginInit();
+                        bi.UriSource = new Uri(FacePath, UriKind.RelativeOrAbsolute);
+                        bi.EndInit();
+                        final_image.Source = bi;
+                       
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
+                wplayer.URL = "2.wav";
+                wplayer.controls.play();
+                Console.WriteLine("AAAAAAAAAAAAAA");
+
+
+            }
+
+
+            try
+            {
+                switch (e.Key)
+                {
+                    case Key.Z:
+                        new System.Threading.Thread(() =>
+                        {
+                            var p1 = new System.Windows.Media.MediaPlayer();
+                            p1.Volume = 1.0f;
+                            p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face-\Sound\3.wav"));
+                            p1.Play();
+                            System.Threading.Thread.Sleep(7000);
+                        }).Start();
+
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
+                wplayer.URL = "3.wav";
+                wplayer.controls.play();
+                Console.WriteLine("ZZZZZZZZZZZZZZZZZ");
+
+
+            }
+
+
         }
 
 

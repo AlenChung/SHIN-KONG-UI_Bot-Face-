@@ -49,7 +49,8 @@ namespace WebcamUserControl
         private static string BLOB_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=shinkong;AccountKey=pyl//qs7YQ2VPm1Dl7/8hw5ObceaMTamfobzTvOajmCQyWzWxuS1NYThvfp4HLYkeNRjJYeQ5rc7zZ38YR/Szw==;";
         private ObservableCollection<Person> Persons = new ObservableCollection<Person>();
         private bool _fuseClientRemoteResults;
-        private bool Sound_Flag = false;
+        public static bool Sound_Flag = false;
+        
 
         WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
         private static readonly ImageEncodingParam[] s_jpegParams = {
@@ -217,7 +218,7 @@ namespace WebcamUserControl
             new System.Threading.Thread(() =>
             {
                 var p1 = new System.Windows.Media.MediaPlayer();
-                p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face--master\Sound\3022.mp3"));
+                p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face-\Sound\1.wav"));
                 p1.Play();
                 System.Threading.Thread.Sleep(1000);
             }).Start();
@@ -298,9 +299,11 @@ namespace WebcamUserControl
                         new System.Threading.Thread(() =>
                         {
                             var p1 = new System.Windows.Media.MediaPlayer();
-                            p1.Open(new System.Uri(@"C:\Users\v-bizhon\Downloads\SHIN-KONG-UI_Bot-Face-\SHIN-KONG-UI_Bot-Face-\Sound\3022.mp3"));
+                            p1.Volume = 1.0f;
+                            Console.WriteLine(p1.Volume.ToString());
+                            p1.Open(new System.Uri(@"C:\Users\v-bizhon\Desktop\SHIN-KONG-UI_Bot-Face-\Sound\1.wav"));
                             p1.Play();
-                            System.Threading.Thread.Sleep(1000);
+                            System.Threading.Thread.Sleep(5000);
                         }).Start();
 
                         Console.WriteLine(wplayer.playState.ToString());
@@ -356,23 +359,7 @@ namespace WebcamUserControl
 
                     }
 
-                    //Upload To Blob
-                    string filename = Face_Directory + "\\" + Face_File;
-
-                    string path;
-                    if (Path.GetPathRoot(filename) != null && Path.GetPathRoot(filename) != "")
-                        path = filename.Replace(Path.GetPathRoot(filename), "").Replace("\\", "/");
-                    else
-                        path = filename.Replace("\\", "/");
-
-                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(BLOB_CONNECTION_STRING);
-                    CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-                    CloudBlobContainer container = blobClient.GetContainerReference(BLOB_CONTAINER_STRING);
-                    CloudBlockBlob blockBlob = container.GetBlockBlobReference(path);
-                    using (var fileStream = System.IO.File.OpenRead(filename))
-                    {
-                        blockBlob.UploadFromStream(fileStream);
-                    }
+                    
 
                     String CardPath = Directory.GetCurrentDirectory() + "\\" + Card_Directory;
                     if (!Directory.Exists(CardPath))
@@ -491,6 +478,24 @@ namespace WebcamUserControl
                                     using (Bitmap resizedBitmap = new Bitmap(tempBitmap, new System.Drawing.Size((int)(bitmap.Width), (int)(bitmap.Height))))
                                     {
                                         resizedBitmap.Save(fi_path, System.Drawing.Imaging.ImageFormat.Png);
+
+                                        //Upload To Blob
+                                        string filename = Face_Directory + "\\" + "Final_Card.png";
+
+                                        string path;
+                                        if (Path.GetPathRoot(filename) != null && Path.GetPathRoot(filename) != "")
+                                            path = filename.Replace(Path.GetPathRoot(filename), "").Replace("\\", "/");
+                                        else
+                                            path = filename.Replace("\\", "/");
+
+                                        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(BLOB_CONNECTION_STRING);
+                                        CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+                                        CloudBlobContainer container = blobClient.GetContainerReference(BLOB_CONTAINER_STRING);
+                                        CloudBlockBlob blockBlob = container.GetBlockBlobReference(path);
+                                        using (var fileStream = System.IO.File.OpenRead(filename))
+                                        {
+                                            blockBlob.UploadFromStream(fileStream);
+                                        }
                                     }
                                 }
                             }
